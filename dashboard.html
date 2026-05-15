@@ -1,0 +1,476 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>ShakthiVest — Dashboard</title>
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+<div class="app-layout">
+
+  <!-- SIDEBAR -->
+  <nav class="sidebar">
+    <div class="sidebar-logo">
+      <div class="logo-icon">💰</div>
+      <div><div class="logo-text">ShakthiVest</div><div class="logo-sub">INVEST SMART</div></div>
+    </div>
+    <div class="nav-section">
+      <div class="nav-label">Main</div>
+      <a href="dashboard.html" class="nav-item active"><span class="nav-icon">🏠</span> Dashboard</a>
+      <a href="portfolio.html" class="nav-item"><span class="nav-icon">📊</span> Portfolio</a>
+      <a href="alerts.html"   class="nav-item"><span class="nav-icon">🔔</span> Alerts <span class="nav-badge" id="badge-alerts">!</span></a>
+      <a href="settings.html" class="nav-item"><span class="nav-icon">⚙️</span> Settings</a>
+      <div class="nav-label">Quick Actions</div>
+      <div class="nav-item" onclick="openAddModal()"><span class="nav-icon">➕</span> Add Investment</div>
+      <div class="nav-item" onclick="runAI()"><span class="nav-icon">🤖</span> AI Suggest</div>
+    </div>
+    <div class="sidebar-bottom">
+      <div class="user-pill">
+        <div class="user-avatar">S</div>
+        <div><div class="user-name">Shakthivel</div><div class="user-role">Investor · Age 21</div></div>
+      </div>
+      <div style="margin-top:8px">
+        <div class="nav-item" onclick="Auth.logout()" style="color:var(--red)"><span class="nav-icon">🚪</span> Logout</div>
+      </div>
+    </div>
+  </nav>
+
+  <!-- MAIN -->
+  <main class="main-content">
+
+    <!-- TOP BAR -->
+    <div class="top-bar">
+      <div class="ticker-strip" id="ticker-strip">
+        <div class="ticker-item"><span class="ticker-dot"></span><span class="ticker-name">Loading market data…</span></div>
+      </div>
+      <div class="top-right">
+        <div class="live-badge"><span style="width:6px;height:6px;border-radius:50%;background:var(--teal);display:inline-block;animation:blink 2s infinite"></span> LIVE</div>
+        <div class="icon-btn" onclick="refreshAll()" title="Refresh">🔄</div>
+        <a href="alerts.html" class="icon-btn" title="Alerts">🔔<span class="notif-dot" id="notif-dot" style="display:none"></span></a>
+      </div>
+    </div>
+
+    <!-- PAGE HEADER -->
+    <div class="page-header">
+      <div class="page-title">Good <span id="greeting-time">morning</span>, Shakthivel 👋</div>
+      <div class="page-sub">Here's your investment overview for <span id="today-date"></span></div>
+    </div>
+
+    <!-- MARKET CARDS -->
+    <div class="market-cards">
+      <div class="market-card" id="mkt-nifty">
+        <div class="mkt-name">NIFTY 50</div>
+        <div class="mkt-val mono">—</div>
+        <div class="mkt-chg">Loading…</div>
+      </div>
+      <div class="market-card" id="mkt-sensex">
+        <div class="mkt-name">SENSEX</div>
+        <div class="mkt-val mono">—</div>
+        <div class="mkt-chg">Loading…</div>
+      </div>
+      <div class="market-card" id="mkt-gold">
+        <div class="mkt-name">GOLD / gram</div>
+        <div class="mkt-val mono">—</div>
+        <div class="mkt-chg">Loading…</div>
+      </div>
+      <div class="market-card" id="mkt-usdinr">
+        <div class="mkt-name">USD / INR</div>
+        <div class="mkt-val mono">—</div>
+        <div class="mkt-chg">Loading…</div>
+      </div>
+    </div>
+
+    <!-- STAT CARDS -->
+    <div class="stats-grid">
+      <div class="stat-card gold">
+        <div class="stat-label">Total Portfolio Value</div>
+        <div class="stat-value mono" id="stat-total-val">₹0</div>
+        <div class="stat-change" id="stat-total-chg"><span>—</span></div>
+        <div class="stat-icon">💰</div>
+      </div>
+      <div class="stat-card teal">
+        <div class="stat-label">Total P&amp;L</div>
+        <div class="stat-value mono" id="stat-pnl">₹0</div>
+        <div class="stat-change" id="stat-pnl-pct"><span>—</span></div>
+        <div class="stat-icon">📈</div>
+      </div>
+      <div class="stat-card blue">
+        <div class="stat-label">Total Invested</div>
+        <div class="stat-value mono" id="stat-invested">₹0</div>
+        <div class="stat-change"><span style="color:var(--text3)">Cost basis</span></div>
+        <div class="stat-icon">💼</div>
+      </div>
+      <div class="stat-card red">
+        <div class="stat-label">Investments</div>
+        <div class="stat-value mono" id="stat-count">0</div>
+        <div class="stat-change"><span style="color:var(--text3)">Active positions</span></div>
+        <div class="stat-icon">🗂️</div>
+      </div>
+    </div>
+
+    <!-- BOTTOM GRID -->
+    <div class="grid-3-1" style="gap:18px;align-items:start">
+
+      <!-- LEFT: AI SUGGESTER + PORTFOLIO PREVIEW -->
+      <div style="display:flex;flex-direction:column;gap:18px">
+
+        <!-- AI SUGGEST PANEL -->
+        <div class="card">
+          <div class="section-row">
+            <div class="section-title">🤖 AI Investment Suggester</div>
+            <span class="tag tag-gold">Claude Powered</span>
+          </div>
+          <p style="font-size:12px;color:var(--text3);margin-bottom:14px">Enter your available amount and get a personalised split suggestion for Indian markets.</p>
+
+          <div class="form-grid" style="margin-bottom:12px">
+            <div class="form-group" style="margin:0">
+              <label class="form-label">Amount to Invest (₹)</label>
+              <div class="amount-input-wrap">
+                <span class="amount-prefix">₹</span>
+                <input id="ai-amount" class="form-input" type="number" placeholder="5000" min="500" />
+              </div>
+            </div>
+            <div class="form-group" style="margin:0">
+              <label class="form-label">Time Horizon</label>
+              <select id="ai-horizon" class="form-select">
+                <option value="short (under 1 year)">Short — Under 1 Year</option>
+                <option value="medium (1–5 years)" selected>Medium — 1 to 5 Years</option>
+                <option value="long (5+ years)">Long — 5+ Years</option>
+              </select>
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label">Risk Appetite</label>
+            <div class="risk-btns">
+              <div class="risk-btn" id="risk-low"  onclick="setRisk('low')">🛡️ Low</div>
+              <div class="risk-btn active-mid" id="risk-medium" onclick="setRisk('medium')">⚖️ Medium</div>
+              <div class="risk-btn" id="risk-high" onclick="setRisk('high')">🚀 High</div>
+            </div>
+          </div>
+
+          <button class="btn btn-primary" id="ai-btn" onclick="runAI()" style="width:100%;justify-content:center">
+            ✨ Get AI Suggestion
+          </button>
+
+          <div id="ai-output" style="display:none">
+            <div class="divider"></div>
+            <div id="ai-result" class="ai-response"></div>
+          </div>
+        </div>
+
+        <!-- RECENT PORTFOLIO -->
+        <div class="card">
+          <div class="section-row">
+            <div class="section-title">📋 Portfolio Snapshot</div>
+            <a href="portfolio.html" class="btn btn-secondary btn-sm">View All →</a>
+          </div>
+          <div id="dash-portfolio-table"><div style="color:var(--text3);font-size:13px;padding:8px 0">Loading…</div></div>
+        </div>
+
+      </div>
+
+      <!-- RIGHT COLUMN -->
+      <div style="display:flex;flex-direction:column;gap:18px">
+
+        <!-- ALLOCATION PIE -->
+        <div class="card">
+          <div class="section-title" style="margin-bottom:14px">🥧 Allocation</div>
+          <div id="dash-allocation"><div style="color:var(--text3);font-size:13px">Add investments to see allocation.</div></div>
+        </div>
+
+        <!-- GOLD INSIGHT -->
+        <div class="card" style="border-color:rgba(245,197,24,0.2)">
+          <div class="section-title" style="color:var(--gold);margin-bottom:10px">🥇 Gold Insight</div>
+          <div id="gold-insight" style="font-size:13px;color:var(--text2);line-height:1.7">Loading gold data…</div>
+          <div class="divider"></div>
+          <div style="font-size:12px;color:var(--text3)">💡 SGB gives 2.5% annual interest + gold price appreciation, tax-free at maturity.</div>
+        </div>
+
+        <!-- QUICK TIPS -->
+        <div class="card">
+          <div class="section-title" style="margin-bottom:10px">💡 Daily Tip</div>
+          <div id="daily-tip" style="font-size:13px;color:var(--text2);line-height:1.7"></div>
+        </div>
+
+        <!-- ALERT STATUS -->
+        <div class="card">
+          <div class="section-row" style="margin-bottom:10px">
+            <div class="section-title">🔔 Alert Monitor</div>
+            <div class="alert-status">
+              <span class="status-dot inactive" id="monitor-status-dot"></span>
+              <span id="monitor-status-text" style="font-size:12px;color:var(--text3)">Paused</span>
+            </div>
+          </div>
+          <div style="font-size:12px;color:var(--text3);margin-bottom:10px">Monitors your portfolio every 15 min and sends WhatsApp alerts if any investment drops.</div>
+          <button class="btn btn-secondary btn-sm" onclick="toggleMonitor()" id="monitor-btn" style="width:100%;justify-content:center">▶️ Start Monitoring</button>
+        </div>
+
+      </div>
+    </div>
+
+  </main>
+</div>
+
+<!-- ADD INVESTMENT MODAL -->
+<div class="modal-overlay" id="add-modal">
+  <div class="modal">
+    <div class="modal-header">
+      <div class="modal-title">➕ Add Investment</div>
+      <button class="close-btn" onclick="closeAddModal()">✕</button>
+    </div>
+    <div class="form-grid">
+      <div class="form-group">
+        <label class="form-label">Investment Name *</label>
+        <input id="inv-name" class="form-input" placeholder="e.g. Nifty BeES ETF" />
+      </div>
+      <div class="form-group">
+        <label class="form-label">Type *</label>
+        <select id="inv-type" class="form-select">
+          <option value="stock">Stock</option>
+          <option value="mutualfund">Mutual Fund</option>
+          <option value="gold">Gold</option>
+          <option value="fd">Fixed Deposit</option>
+          <option value="ppf">PPF / NPS</option>
+          <option value="crypto">Crypto</option>
+        </select>
+      </div>
+    </div>
+    <div class="form-group">
+      <label class="form-label">NSE Symbol (for live price, optional)</label>
+      <input id="inv-symbol" class="form-input" placeholder="e.g. RELIANCE.NS or GOLDBEES.NS" />
+    </div>
+    <div class="form-grid">
+      <div class="form-group">
+        <label class="form-label">Units / Quantity *</label>
+        <input id="inv-units" class="form-input" type="number" placeholder="10" min="0.001" step="any" />
+      </div>
+      <div class="form-group">
+        <label class="form-label">Buy Price per Unit (₹) *</label>
+        <div class="amount-input-wrap">
+          <span class="amount-prefix">₹</span>
+          <input id="inv-buyprice" class="form-input" type="number" placeholder="500" min="0" step="any" />
+        </div>
+      </div>
+    </div>
+    <div class="form-grid">
+      <div class="form-group">
+        <label class="form-label">Buy Date</label>
+        <input id="inv-date" class="form-input" type="date" />
+      </div>
+      <div class="form-group">
+        <label class="form-label">Alert if drops by (%)</label>
+        <input id="inv-alert" class="form-input" type="number" placeholder="5" min="1" max="99" />
+      </div>
+    </div>
+    <div style="display:flex;gap:10px;margin-top:4px">
+      <button class="btn btn-secondary" onclick="closeAddModal()" style="flex:1;justify-content:center">Cancel</button>
+      <button class="btn btn-primary" onclick="saveInvestment()" style="flex:1;justify-content:center">💾 Save Investment</button>
+    </div>
+  </div>
+</div>
+
+<script src="js/auth.js"></script>
+<script src="js/toast.js"></script>
+<script src="js/market.js"></script>
+<script src="js/portfolio.js"></script>
+<script src="js/alerts.js"></script>
+<script src="js/ai-suggest.js"></script>
+<script>
+Auth.checkAuth();
+Auth.injectUserUI();
+
+let selectedRisk = 'medium';
+let monitoring   = false;
+
+const TIPS = [
+  '📌 Start SIPs early — ₹500/month in a Nifty index fund at 21 could grow to ₹35L+ by 45.',
+  '🥇 Gold should be 10–15% of your portfolio as a hedge against inflation.',
+  '🔄 Rebalance your portfolio every 6 months to maintain your target allocation.',
+  '📉 Market dips are sales! Top up your SIPs during corrections, not reduce them.',
+  '🏦 Keep 6 months of expenses in an FD before investing aggressively.',
+  '💡 ELSS mutual funds save tax under 80C and have the shortest lock-in (3 yrs).',
+  '📊 A Nifty 50 index fund beats 80% of actively managed funds over 10 years.',
+  '⚡ Invest first, spend later — automate your SIPs on salary day.',
+];
+
+// ── INIT ──
+window.addEventListener('DOMContentLoaded', async () => {
+  setGreeting();
+  document.getElementById('today-date').textContent = new Date().toLocaleDateString('en-IN', { weekday:'long', day:'numeric', month:'long', year:'numeric' });
+  document.getElementById('daily-tip').textContent = TIPS[new Date().getDay() % TIPS.length];
+  document.getElementById('inv-date').value = new Date().toISOString().split('T')[0];
+
+  updateStats();
+  renderDashPortfolio();
+  Portfolio.renderAllocation('dash-allocation');
+
+  // Market data
+  Market.init().then(data => {
+    updateGoldInsight(data);
+  });
+  Market.startAutoRefresh();
+
+  // Alert badge
+  if (!Alerts.isConfigured()) {
+    document.getElementById('badge-alerts').style.display = 'inline';
+    document.getElementById('notif-dot').style.display = 'block';
+  } else {
+    document.getElementById('badge-alerts').style.display = 'none';
+  }
+});
+
+function setGreeting() {
+  const h = new Date().getHours();
+  const g = h < 12 ? 'morning' : h < 17 ? 'afternoon' : 'evening';
+  document.getElementById('greeting-time').textContent = g;
+}
+
+function updateStats() {
+  const s = Portfolio.getSummary();
+  document.getElementById('stat-total-val').textContent = Market.fmtINR(s.totalVal);
+  document.getElementById('stat-invested').textContent  = Market.fmtINR(s.totalCost);
+  document.getElementById('stat-count').textContent     = s.count;
+  const pnlEl  = document.getElementById('stat-pnl');
+  const pctEl  = document.getElementById('stat-pnl-pct');
+  pnlEl.textContent  = (s.totalPnL >= 0 ? '+' : '') + Market.fmtINR(s.totalPnL);
+  pnlEl.className    = 'stat-value mono ' + (s.totalPnL >= 0 ? 'gain' : 'loss');
+  pctEl.innerHTML    = `<span class="${s.totalPnL >= 0 ? 'up' : 'down'}">${s.totalPnL >= 0 ? '+' : ''}${s.totalPct.toFixed(2)}% all time</span>`;
+  pctEl.className    = 'stat-change ' + (s.totalPnL >= 0 ? 'up' : 'down');
+  const totalChgEl   = document.getElementById('stat-total-chg');
+  totalChgEl.innerHTML = `<span style="color:var(--text3)">Invested: ${Market.fmtINR(s.totalCost)}</span>`;
+}
+
+function renderDashPortfolio() {
+  const list = Portfolio.getAll().slice(0, 5);
+  const tbody = document.getElementById('dash-portfolio-table');
+  if (list.length === 0) {
+    tbody.innerHTML = `<div class="empty-state" style="padding:20px">
+      <div class="empty-icon">📭</div>
+      <div class="empty-text">No investments yet</div>
+      <button class="btn btn-primary btn-sm" onclick="openAddModal()">+ Add First Investment</button>
+    </div>`; return;
+  }
+  tbody.innerHTML = `<div class="table-wrap"><table class="data-table">
+    <thead><tr><th>Name</th><th>Type</th><th>Value</th><th>P&L</th></tr></thead>
+    <tbody>${list.map(inv => {
+      const { val, pnl, pct } = Portfolio.calcPnL(inv);
+      const meta = Portfolio.TYPE_META[inv.type] || {};
+      const isGain = pnl >= 0;
+      return `<tr>
+        <td><span style="font-weight:500">${inv.name}</span></td>
+        <td><span class="tag tag-gray">${meta.icon||''} ${meta.label||inv.type}</span></td>
+        <td class="mono">${Market.fmtINR(val)}</td>
+        <td class="mono ${isGain?'gain-text':'loss-text'}">${isGain?'+':''}${pct.toFixed(2)}%</td>
+      </tr>`;
+    }).join('')}</tbody>
+  </table></div>`;
+}
+
+function updateGoldInsight(data) {
+  const g = data?.gold;
+  if (!g) return;
+  const el = document.getElementById('gold-insight');
+  const isUp = g.change >= 0;
+  el.innerHTML = `
+    <div style="font-size:22px;font-family:'DM Mono',monospace;color:var(--gold);margin-bottom:6px">₹${g.price.toFixed(2)}<span style="font-size:13px;color:var(--text3)">/gram</span></div>
+    <div style="font-size:13px;color:${isUp?'var(--teal)':'var(--red)'}">Today: ${isUp?'+':''}${g.change.toFixed(2)} (${isUp?'+':''}${g.changePct.toFixed(2)}%)</div>
+    <div style="margin-top:8px;font-size:12px;color:var(--text3)">
+      ${isUp ? '📈 Gold is rising — SGB investors are benefiting today.' : '📉 Gold dipped — good time to accumulate via Gold ETF SIP.'}
+    </div>`;
+}
+
+// ── AI SUGGEST ──
+function setRisk(level) {
+  selectedRisk = level;
+  ['low','medium','high'].forEach(r => {
+    const btn = document.getElementById('risk-' + r);
+    btn.className = 'risk-btn' + (r === level ? ' active-' + r : '');
+  });
+}
+
+async function runAI() {
+  const amount = parseFloat(document.getElementById('ai-amount').value);
+  if (!amount || amount < 100) { Toast.show('Enter a valid amount (min ₹100)', 'error'); return; }
+  const horizon = document.getElementById('ai-horizon').value;
+  const btn = document.getElementById('ai-btn');
+  const outDiv = document.getElementById('ai-output');
+  const resultDiv = document.getElementById('ai-result');
+
+  btn.textContent = '⏳ Thinking…';
+  btn.disabled = true;
+  outDiv.style.display = 'block';
+  resultDiv.className = 'ai-response loading';
+  resultDiv.innerHTML = '<span class="typing-dot"></span><span class="typing-dot"></span><span class="typing-dot"></span>';
+
+  const result = await AISuggest.getSuggestion({ amount, risk: selectedRisk, horizon });
+
+  if (result.ok) {
+    resultDiv.className = 'ai-response';
+    AISuggest.renderText('ai-result', result.text);
+  } else {
+    resultDiv.className = 'ai-response';
+    resultDiv.innerHTML = `<div style="color:var(--red)">❌ ${result.error}</div>
+      <div style="margin-top:8px;font-size:12px;color:var(--text3)">Add your Anthropic API key in <a href="settings.html" style="color:var(--gold)">Settings</a> to enable AI suggestions.</div>`;
+  }
+  btn.textContent = '✨ Get AI Suggestion';
+  btn.disabled = false;
+}
+
+// ── MONITOR ──
+function toggleMonitor() {
+  const btn = document.getElementById('monitor-btn');
+  if (Alerts.isMonitoring()) {
+    Alerts.stopMonitoring();
+    btn.textContent = '▶️ Start Monitoring';
+  } else {
+    if (!Alerts.isConfigured()) {
+      Toast.show('Configure WhatsApp in Alerts settings first!', 'error');
+      setTimeout(() => window.location.href = 'alerts.html', 1500);
+      return;
+    }
+    Alerts.startMonitoring();
+    btn.textContent = '⏹️ Stop Monitoring';
+    Toast.show('✅ Monitoring started! WhatsApp alerts active.', 'success');
+  }
+}
+
+// ── REFRESH ──
+async function refreshAll() {
+  Toast.show('Refreshing market data…', 'info');
+  await Market.init();
+  updateStats();
+  renderDashPortfolio();
+  Portfolio.renderAllocation('dash-allocation');
+}
+
+// ── ADD MODAL ──
+function openAddModal() { document.getElementById('add-modal').classList.add('open'); }
+function closeAddModal() { document.getElementById('add-modal').classList.remove('open'); }
+
+function saveInvestment() {
+  const name     = document.getElementById('inv-name').value.trim();
+  const type     = document.getElementById('inv-type').value;
+  const symbol   = document.getElementById('inv-symbol').value.trim();
+  const units    = parseFloat(document.getElementById('inv-units').value);
+  const buyPrice = parseFloat(document.getElementById('inv-buyprice').value);
+  const buyDate  = document.getElementById('inv-date').value;
+  const alertTh  = parseFloat(document.getElementById('inv-alert').value) || null;
+
+  if (!name || !units || !buyPrice) { Toast.show('Fill in all required fields!', 'error'); return; }
+
+  Portfolio.add({ name, type, symbol, units, buyPrice, buyDate, alertThreshold: alertTh });
+  closeAddModal();
+  Toast.show(`✅ ${name} added to portfolio!`, 'success');
+  updateStats();
+  renderDashPortfolio();
+  Portfolio.renderAllocation('dash-allocation');
+
+  // Clear form
+  ['inv-name','inv-symbol','inv-units','inv-buyprice','inv-alert'].forEach(id => document.getElementById(id).value = '');
+}
+
+document.getElementById('add-modal').addEventListener('click', e => { if (e.target === document.getElementById('add-modal')) closeAddModal(); });
+</script>
+</body>
+</html>

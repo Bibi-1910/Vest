@@ -1,0 +1,374 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>ShakthiVest — Alerts</title>
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+<div class="app-layout">
+  <nav class="sidebar">
+    <div class="sidebar-logo">
+      <div class="logo-icon">💰</div>
+      <div><div class="logo-text">ShakthiVest</div><div class="logo-sub">INVEST SMART</div></div>
+    </div>
+    <div class="nav-section">
+      <div class="nav-label">Main</div>
+      <a href="dashboard.html" class="nav-item"><span class="nav-icon">🏠</span> Dashboard</a>
+      <a href="portfolio.html" class="nav-item"><span class="nav-icon">📊</span> Portfolio</a>
+      <a href="alerts.html"   class="nav-item active"><span class="nav-icon">🔔</span> Alerts</a>
+      <a href="settings.html" class="nav-item"><span class="nav-icon">⚙️</span> Settings</a>
+    </div>
+    <div class="sidebar-bottom">
+      <div class="user-pill">
+        <div class="user-avatar">S</div>
+        <div><div class="user-name">Shakthivel</div><div class="user-role">Investor · Age 21</div></div>
+      </div>
+      <div style="margin-top:8px"><div class="nav-item" onclick="Auth.logout()" style="color:var(--red)"><span class="nav-icon">🚪</span> Logout</div></div>
+    </div>
+  </nav>
+
+  <main class="main-content">
+    <div class="top-bar">
+      <div style="font-size:13px;color:var(--text3)">WhatsApp alerts keep you informed about your portfolio in real-time.</div>
+      <div class="top-right">
+        <div class="alert-status">
+          <span class="status-dot inactive" id="monitor-status-dot"></span>
+          <span id="monitor-status-text" style="font-size:13px;color:var(--text2)">Monitor Off</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="page-header">
+      <div class="page-title">🔔 WhatsApp Alert Centre</div>
+      <div class="page-sub">Get instant WhatsApp messages when your investments are at risk</div>
+    </div>
+
+    <div class="grid-2" style="align-items:start;gap:18px">
+
+      <!-- LEFT COLUMN -->
+      <div style="display:flex;flex-direction:column;gap:18px">
+
+        <!-- CALLMEBOT SETUP -->
+        <div class="card" style="border-color:rgba(0,212,170,0.2)">
+          <div class="section-title" style="color:var(--teal);margin-bottom:14px">📲 CallMeBot Setup (Free)</div>
+
+          <div class="setup-steps">
+            <div class="setup-step">
+              <div class="step-num" id="step1-num">1</div>
+              <div class="step-content">
+                <div class="step-title">Save CallMeBot contact</div>
+                <div class="step-desc">Add this number to your WhatsApp contacts:</div>
+                <div class="step-code">+34 644 64 07 35</div>
+              </div>
+            </div>
+            <div class="setup-step">
+              <div class="step-num" id="step2-num">2</div>
+              <div class="step-content">
+                <div class="step-title">Activate the service</div>
+                <div class="step-desc">Send this exact message to the number above on WhatsApp:</div>
+                <div class="step-code">I allow callmebot to send me messages</div>
+              </div>
+            </div>
+            <div class="setup-step">
+              <div class="step-num" id="step3-num">3</div>
+              <div class="step-content">
+                <div class="step-title">Get your API Key</div>
+                <div class="step-desc">CallMeBot will reply with your unique API key. Copy it and paste below.</div>
+              </div>
+            </div>
+            <div class="setup-step">
+              <div class="step-num" id="step4-num">4</div>
+              <div class="step-content">
+                <div class="step-title">Enter details below &amp; save</div>
+                <div class="step-desc">Fill your phone number (with country code) and API key, then start monitoring.</div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- CONFIG FORM -->
+        <div class="card">
+          <div class="section-title" style="margin-bottom:16px">⚙️ Alert Configuration</div>
+
+          <div class="form-group">
+            <label class="form-label">WhatsApp Number (with country code, no +)</label>
+            <input id="cfg-phone" class="form-input" placeholder="919876543210  (91 = India code)" type="tel" />
+          </div>
+          <div class="form-group">
+            <label class="form-label">CallMeBot API Key</label>
+            <input id="cfg-apikey" class="form-input" placeholder="e.g. 1234567" type="text" />
+          </div>
+
+          <div class="divider"></div>
+
+          <div class="form-grid">
+            <div class="form-group">
+              <label class="form-label">Global Drop Alert (%)</label>
+              <input id="cfg-drop" class="form-input" type="number" placeholder="5" min="1" max="99"
+                title="Send alert when any investment falls by this %" />
+              <div style="font-size:11px;color:var(--text3);margin-top:4px">Alert when any holding drops by this %</div>
+            </div>
+            <div class="form-group">
+              <label class="form-label">Market Crash Alert (%)</label>
+              <input id="cfg-crash" class="form-input" type="number" placeholder="2" min="0.5" max="20"
+                title="Send alert when Nifty 50 falls by this % in a day" />
+              <div style="font-size:11px;color:var(--text3);margin-top:4px">Alert when Nifty 50 drops by this %</div>
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label">Check Frequency (minutes)</label>
+            <select id="cfg-freq" class="form-select">
+              <option value="5">Every 5 minutes</option>
+              <option value="15" selected>Every 15 minutes</option>
+              <option value="30">Every 30 minutes</option>
+              <option value="60">Every hour</option>
+            </select>
+          </div>
+
+          <div style="display:flex;gap:10px;margin-top:8px">
+            <button class="btn btn-secondary" onclick="testAlert()" style="flex:1;justify-content:center" id="test-btn">
+              📱 Send Test Alert
+            </button>
+            <button class="btn btn-primary" onclick="saveAlertSettings()" style="flex:1;justify-content:center">
+              💾 Save Settings
+            </button>
+          </div>
+        </div>
+
+        <!-- ALERT TYPES -->
+        <div class="card">
+          <div class="section-title" style="margin-bottom:14px">🎯 Alert Types</div>
+          <div style="display:flex;flex-direction:column;gap:10px">
+            <div style="display:flex;justify-content:space-between;align-items:center;padding:10px 0;border-bottom:1px solid var(--border)">
+              <div>
+                <div style="font-size:13px;font-weight:500;color:var(--text)">📉 Investment Drop Alert</div>
+                <div style="font-size:12px;color:var(--text3)">When any holding falls below your threshold</div>
+              </div>
+              <div class="toggle-wrap" onclick="toggleAlert('drop',this)">
+                <div class="toggle on" id="toggle-drop"></div>
+              </div>
+            </div>
+            <div style="display:flex;justify-content:space-between;align-items:center;padding:10px 0;border-bottom:1px solid var(--border)">
+              <div>
+                <div style="font-size:13px;font-weight:500;color:var(--text)">📊 Market Crash Alert</div>
+                <div style="font-size:12px;color:var(--text3)">When Nifty 50 drops significantly</div>
+              </div>
+              <div class="toggle-wrap" onclick="toggleAlert('crash',this)">
+                <div class="toggle on" id="toggle-crash"></div>
+              </div>
+            </div>
+            <div style="display:flex;justify-content:space-between;align-items:center;padding:10px 0;border-bottom:1px solid var(--border)">
+              <div>
+                <div style="font-size:13px;font-weight:500;color:var(--text)">🥇 Gold Price Alert</div>
+                <div style="font-size:12px;color:var(--text3)">Daily gold price summary at 9 AM</div>
+              </div>
+              <div class="toggle-wrap" onclick="toggleAlert('gold',this)">
+                <div class="toggle" id="toggle-gold"></div>
+              </div>
+            </div>
+            <div style="display:flex;justify-content:space-between;align-items:center;padding:10px 0">
+              <div>
+                <div style="font-size:13px;font-weight:500;color:var(--text)">📅 Weekly Portfolio Summary</div>
+                <div style="font-size:12px;color:var(--text3)">Every Monday morning — portfolio overview</div>
+              </div>
+              <div class="toggle-wrap" onclick="toggleAlert('weekly',this)">
+                <div class="toggle" id="toggle-weekly"></div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+      </div>
+
+      <!-- RIGHT COLUMN -->
+      <div style="display:flex;flex-direction:column;gap:18px">
+
+        <!-- MONITOR CONTROL -->
+        <div class="card" style="text-align:center;padding:28px">
+          <div style="font-size:48px;margin-bottom:12px" id="monitor-icon">⏸️</div>
+          <div style="font-size:18px;font-weight:600;color:var(--text);margin-bottom:6px" id="monitor-label">Monitor Off</div>
+          <div style="font-size:13px;color:var(--text3);margin-bottom:20px">Keep this tab open to receive real-time alerts</div>
+          <button class="btn btn-primary" onclick="toggleMonitor()" id="monitor-btn" style="width:100%;justify-content:center;padding:13px;font-size:14px">
+            ▶️ Start Monitoring
+          </button>
+          <div style="margin-top:12px;font-size:12px;color:var(--text3)" id="next-check-text"></div>
+        </div>
+
+        <!-- PREVIEW ALERT -->
+        <div class="card" style="border-color:rgba(0,212,170,0.15)">
+          <div class="section-title" style="margin-bottom:12px">📱 Alert Preview</div>
+          <div style="background:var(--surface2);border-radius:10px;padding:14px;font-size:13px;color:var(--text2);line-height:1.8;font-family:'DM Mono',monospace;border:1px solid var(--border)">
+            🚨 ShakthiVest LOSS ALERT 🚨<br><br>
+            Hey Shakthivel! The following investments need attention:<br><br>
+            ⚠️ Nifty BeES: DOWN -6.2% (Loss: ₹372)<br>
+            ⚠️ HDFC MF: DOWN -5.8% (Loss: ₹290)<br><br>
+            📊 Check your dashboard immediately!<br>
+            Time: 14:32, 15 May 2026
+          </div>
+          <div style="margin-top:10px;font-size:12px;color:var(--text3)">This is how your WhatsApp alert will look.</div>
+        </div>
+
+        <!-- ALERT LOG -->
+        <div class="card">
+          <div class="section-row" style="margin-bottom:12px">
+            <div class="section-title">📋 Alert History</div>
+            <button class="btn btn-secondary btn-sm" onclick="clearLog()">🗑️ Clear</button>
+          </div>
+          <div class="alert-log" id="alert-log">
+            <div style="color:var(--text3);font-size:13px;padding:8px 0">No alerts sent yet.</div>
+          </div>
+        </div>
+
+        <!-- GOLD DAILY SUMMARY -->
+        <div class="card" style="border-color:rgba(245,197,24,0.2)">
+          <div class="section-title" style="color:var(--gold);margin-bottom:12px">🥇 Send Gold Update Now</div>
+          <div style="font-size:13px;color:var(--text3);margin-bottom:12px">Get today's gold price and SGB insight on WhatsApp.</div>
+          <button class="btn btn-secondary btn-sm" onclick="sendGoldUpdate()" style="width:100%;justify-content:center">📲 Send Gold WhatsApp</button>
+        </div>
+
+      </div>
+    </div>
+  </main>
+</div>
+
+<script src="js/auth.js"></script>
+<script src="js/toast.js"></script>
+<script src="js/market.js"></script>
+<script src="js/portfolio.js"></script>
+<script src="js/alerts.js"></script>
+<script>
+Auth.checkAuth();
+let monitorInterval = null;
+let nextCheckTime   = null;
+
+window.addEventListener('DOMContentLoaded', () => {
+  loadSettings();
+  Alerts.renderLog('alert-log');
+  updateMonitorUI(false);
+});
+
+function loadSettings() {
+  const s = Alerts.getSettings();
+  if (s.phone)           document.getElementById('cfg-phone').value  = s.phone;
+  if (s.apiKey)          document.getElementById('cfg-apikey').value = s.apiKey;
+  if (s.globalDropAlert) document.getElementById('cfg-drop').value   = s.globalDropAlert;
+  if (s.marketCrashAlert)document.getElementById('cfg-crash').value  = s.marketCrashAlert;
+  if (s.checkFrequency)  document.getElementById('cfg-freq').value   = s.checkFrequency;
+
+  // Toggles
+  if (s.toggles) {
+    ['drop','crash','gold','weekly'].forEach(k => {
+      if (s.toggles[k] === false) document.getElementById('toggle-' + k).classList.remove('on');
+    });
+  }
+
+  // Mark setup steps done if configured
+  if (s.phone && s.apiKey) {
+    ['step1-num','step2-num','step3-num','step4-num'].forEach(id => {
+      const el = document.getElementById(id);
+      if (el) { el.textContent = '✓'; el.classList.add('done'); }
+    });
+  }
+}
+
+function saveAlertSettings() {
+  const phone  = document.getElementById('cfg-phone').value.trim();
+  const apiKey = document.getElementById('cfg-apikey').value.trim();
+  if (!phone || !apiKey) { Toast.show('Phone number and API key are required!', 'error'); return; }
+  const s = {
+    phone, apiKey,
+    globalDropAlert:  parseFloat(document.getElementById('cfg-drop').value)  || 5,
+    marketCrashAlert: parseFloat(document.getElementById('cfg-crash').value) || 2,
+    checkFrequency:   parseInt(document.getElementById('cfg-freq').value)    || 15,
+    toggles: {
+      drop:   document.getElementById('toggle-drop').classList.contains('on'),
+      crash:  document.getElementById('toggle-crash').classList.contains('on'),
+      gold:   document.getElementById('toggle-gold').classList.contains('on'),
+      weekly: document.getElementById('toggle-weekly').classList.contains('on'),
+    }
+  };
+  Alerts.saveSettings(s);
+  Toast.show('✅ Alert settings saved!', 'success');
+  ['step1-num','step2-num','step3-num','step4-num'].forEach(id => {
+    const el = document.getElementById(id);
+    if (el) { el.textContent = '✓'; el.classList.add('done'); }
+  });
+}
+
+async function testAlert() {
+  const btn = document.getElementById('test-btn');
+  btn.textContent = '⏳ Sending…'; btn.disabled = true;
+  await Alerts.testAlert();
+  Alerts.renderLog('alert-log');
+  btn.textContent = '📱 Send Test Alert'; btn.disabled = false;
+}
+
+async function sendGoldUpdate() {
+  const data = await Market.fetchAll();
+  const g = data.gold;
+  if (!g) { Toast.show('Could not fetch gold price', 'error'); return; }
+  const msg = `🥇 Gold Price Update\n\nCurrent: ₹${g.price.toFixed(2)}/gram\nToday: ${g.change >= 0 ? '+' : ''}${g.changePct.toFixed(2)}%\n\n${g.change >= 0 ? '📈 Gold is up — your SGB is looking good!' : '📉 Gold dipped — consider adding to your Gold ETF SIP.'}\n\n💡 SGB Tip: Hold to maturity (8 yrs) for zero tax + 2.5% annual interest.\n\nTime: ${new Date().toLocaleString('en-IN')}`;
+  await Alerts.sendWhatsApp(msg);
+  Alerts.renderLog('alert-log');
+}
+
+function toggleAlert(key, wrap) {
+  const tog = document.getElementById('toggle-' + key);
+  tog.classList.toggle('on');
+}
+
+function clearLog() {
+  localStorage.removeItem('sv_alert_log');
+  Alerts.renderLog('alert-log');
+  Toast.show('Alert history cleared', 'info');
+}
+
+function toggleMonitor() {
+  const btn = document.getElementById('monitor-btn');
+  if (monitorInterval) {
+    clearInterval(monitorInterval);
+    monitorInterval = null;
+    Alerts.stopMonitoring();
+    updateMonitorUI(false);
+    btn.textContent = '▶️ Start Monitoring';
+  } else {
+    if (!Alerts.isConfigured()) { Toast.show('Save your WhatsApp settings first!', 'error'); return; }
+    Alerts.startMonitoring();
+    updateMonitorUI(true);
+    btn.textContent = '⏹️ Stop Monitoring';
+    const freq = parseInt(document.getElementById('cfg-freq').value) || 15;
+    nextCheckTime = Date.now() + freq * 60 * 1000;
+    setInterval(() => {
+      if (nextCheckTime) {
+        const remaining = Math.max(0, Math.round((nextCheckTime - Date.now()) / 1000));
+        const mins = Math.floor(remaining / 60), secs = remaining % 60;
+        const txt = document.getElementById('next-check-text');
+        if (txt) txt.textContent = `Next check in ${mins}m ${secs}s`;
+      }
+    }, 1000);
+  }
+  Alerts.renderLog('alert-log');
+}
+
+function updateMonitorUI(active) {
+  const icon  = document.getElementById('monitor-icon');
+  const label = document.getElementById('monitor-label');
+  const dot   = document.getElementById('monitor-status-dot');
+  const text  = document.getElementById('monitor-status-text');
+  if (active) {
+    icon.textContent  = '🟢'; label.textContent = 'Monitor Active';
+    if (dot) { dot.className = 'status-dot active'; }
+    if (text) text.textContent = 'Monitoring Active';
+  } else {
+    icon.textContent  = '⏸️'; label.textContent = 'Monitor Off';
+    if (dot) { dot.className = 'status-dot inactive'; }
+    if (text) text.textContent = 'Monitor Off';
+    const txt = document.getElementById('next-check-text');
+    if (txt) txt.textContent = '';
+  }
+}
+</script>
+</body>
+</html>

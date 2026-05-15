@@ -1,0 +1,348 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>ShakthiVest — Settings</title>
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+<div class="app-layout">
+  <nav class="sidebar">
+    <div class="sidebar-logo">
+      <div class="logo-icon">💰</div>
+      <div><div class="logo-text">ShakthiVest</div><div class="logo-sub">INVEST SMART</div></div>
+    </div>
+    <div class="nav-section">
+      <div class="nav-label">Main</div>
+      <a href="dashboard.html" class="nav-item"><span class="nav-icon">🏠</span> Dashboard</a>
+      <a href="portfolio.html" class="nav-item"><span class="nav-icon">📊</span> Portfolio</a>
+      <a href="alerts.html"   class="nav-item"><span class="nav-icon">🔔</span> Alerts</a>
+      <a href="settings.html" class="nav-item active"><span class="nav-icon">⚙️</span> Settings</a>
+    </div>
+    <div class="sidebar-bottom">
+      <div class="user-pill">
+        <div class="user-avatar">S</div>
+        <div><div class="user-name">Shakthivel</div><div class="user-role">Investor · Age 21</div></div>
+      </div>
+      <div style="margin-top:8px"><div class="nav-item" onclick="Auth.logout()" style="color:var(--red)"><span class="nav-icon">🚪</span> Logout</div></div>
+    </div>
+  </nav>
+
+  <main class="main-content">
+    <div class="page-header">
+      <div class="page-title">⚙️ Settings</div>
+      <div class="page-sub">Configure API keys, profile and data</div>
+    </div>
+
+    <div class="grid-2" style="align-items:start;gap:18px">
+
+      <!-- LEFT -->
+      <div style="display:flex;flex-direction:column;gap:18px">
+
+        <!-- AI API KEY -->
+        <div class="card" style="border-color:rgba(245,197,24,0.2)">
+          <div class="section-title" style="color:var(--gold);margin-bottom:14px">🤖 Anthropic API Key</div>
+          <p style="font-size:13px;color:var(--text3);margin-bottom:14px;line-height:1.6">
+            Required to enable the AI Investment Suggester powered by Claude.<br>
+            Get your free key at <a href="https://console.anthropic.com" target="_blank" style="color:var(--gold)">console.anthropic.com</a>
+          </p>
+          <div class="form-group">
+            <label class="form-label">API Key</label>
+            <div style="position:relative">
+              <input id="anthropic-key" class="form-input" type="password" placeholder="sk-ant-…" />
+              <button onclick="toggleKeyVisibility('anthropic-key','eye-anthr')" style="position:absolute;right:10px;top:50%;transform:translateY(-50%);background:none;border:none;cursor:pointer;font-size:14px" id="eye-anthr">👁️</button>
+            </div>
+          </div>
+          <div style="display:flex;gap:10px">
+            <button class="btn btn-secondary btn-sm" onclick="testApiKey()" id="test-api-btn" style="flex:1;justify-content:center">🔍 Test Key</button>
+            <button class="btn btn-primary btn-sm" onclick="saveApiKey()" style="flex:1;justify-content:center">💾 Save Key</button>
+          </div>
+          <div id="api-key-status" style="margin-top:10px;font-size:12px;display:none"></div>
+        </div>
+
+        <!-- PROFILE -->
+        <div class="card">
+          <div class="section-title" style="margin-bottom:14px">👤 Investor Profile</div>
+          <div class="form-grid">
+            <div class="form-group">
+              <label class="form-label">Full Name</label>
+              <input id="prof-name" class="form-input" placeholder="Shakthivel" />
+            </div>
+            <div class="form-group">
+              <label class="form-label">Age</label>
+              <input id="prof-age" class="form-input" type="number" placeholder="21" min="18" max="80" />
+            </div>
+          </div>
+          <div class="form-grid">
+            <div class="form-group">
+              <label class="form-label">Monthly Income (₹)</label>
+              <div class="amount-input-wrap">
+                <span class="amount-prefix">₹</span>
+                <input id="prof-income" class="form-input" type="number" placeholder="30000" />
+              </div>
+            </div>
+            <div class="form-group">
+              <label class="form-label">Monthly SIP Budget (₹)</label>
+              <div class="amount-input-wrap">
+                <span class="amount-prefix">₹</span>
+                <input id="prof-sip" class="form-input" type="number" placeholder="5000" />
+              </div>
+            </div>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Default Risk Level</label>
+            <select id="prof-risk" class="form-select">
+              <option value="low">Low — Safety First</option>
+              <option value="medium" selected>Medium — Balanced Growth</option>
+              <option value="high">High — Aggressive</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Investment Goal</label>
+            <select id="prof-goal" class="form-select">
+              <option value="wealth">Long-term Wealth Building</option>
+              <option value="retirement">Retirement Planning</option>
+              <option value="house">Buy a House</option>
+              <option value="education">Higher Education / Abroad</option>
+              <option value="business">Start a Business</option>
+              <option value="travel">Travel Fund</option>
+            </select>
+          </div>
+          <button class="btn btn-primary btn-sm" onclick="saveProfile()" style="width:100%;justify-content:center">💾 Save Profile</button>
+        </div>
+
+        <!-- APPEARANCE -->
+        <div class="card">
+          <div class="section-title" style="margin-bottom:14px">🎨 Appearance</div>
+          <div style="display:flex;justify-content:space-between;align-items:center;padding:8px 0">
+            <div>
+              <div style="font-size:13px;font-weight:500;color:var(--text)">Dark Mode</div>
+              <div style="font-size:12px;color:var(--text3)">Currently always dark — built for focus</div>
+            </div>
+            <div class="toggle on"></div>
+          </div>
+          <div style="display:flex;justify-content:space-between;align-items:center;padding:8px 0">
+            <div>
+              <div style="font-size:13px;font-weight:500;color:var(--text)">Show Currency in INR</div>
+              <div style="font-size:12px;color:var(--text3)">All values displayed in Indian Rupees</div>
+            </div>
+            <div class="toggle on"></div>
+          </div>
+        </div>
+
+      </div>
+
+      <!-- RIGHT -->
+      <div style="display:flex;flex-direction:column;gap:18px">
+
+        <!-- DATA MANAGEMENT -->
+        <div class="card">
+          <div class="section-title" style="margin-bottom:14px">💾 Data Management</div>
+
+          <div style="display:flex;flex-direction:column;gap:10px">
+            <div style="padding:12px;background:var(--surface2);border-radius:var(--radius-sm);border:1px solid var(--border)">
+              <div style="font-size:13px;font-weight:500;color:var(--text);margin-bottom:4px">📤 Export Portfolio</div>
+              <div style="font-size:12px;color:var(--text3);margin-bottom:10px">Download your portfolio data as a JSON file for backup.</div>
+              <button class="btn btn-secondary btn-sm" onclick="exportData()" style="width:100%;justify-content:center">⬇️ Export JSON</button>
+            </div>
+
+            <div style="padding:12px;background:var(--surface2);border-radius:var(--radius-sm);border:1px solid var(--border)">
+              <div style="font-size:13px;font-weight:500;color:var(--text);margin-bottom:4px">📥 Import Portfolio</div>
+              <div style="font-size:12px;color:var(--text3);margin-bottom:10px">Restore from a previously exported JSON file.</div>
+              <input type="file" id="import-file" accept=".json" style="display:none" onchange="importData(event)" />
+              <button class="btn btn-secondary btn-sm" onclick="document.getElementById('import-file').click()" style="width:100%;justify-content:center">⬆️ Import JSON</button>
+            </div>
+
+            <div style="padding:12px;background:rgba(255,77,109,0.06);border-radius:var(--radius-sm);border:1px solid rgba(255,77,109,0.15)">
+              <div style="font-size:13px;font-weight:500;color:var(--red);margin-bottom:4px">🗑️ Clear All Data</div>
+              <div style="font-size:12px;color:var(--text3);margin-bottom:10px">Delete all portfolio, settings and alert data. This cannot be undone.</div>
+              <button class="btn btn-danger btn-sm" onclick="clearAllData()" style="width:100%;justify-content:center">⚠️ Clear Everything</button>
+            </div>
+          </div>
+        </div>
+
+        <!-- STORAGE INFO -->
+        <div class="card">
+          <div class="section-title" style="margin-bottom:14px">📊 Storage Usage</div>
+          <div id="storage-info" style="font-size:13px;color:var(--text2);line-height:2">Loading…</div>
+        </div>
+
+        <!-- ABOUT -->
+        <div class="card">
+          <div class="section-title" style="margin-bottom:14px">ℹ️ About ShakthiVest</div>
+          <div style="font-size:13px;color:var(--text2);line-height:1.8">
+            <div style="margin-bottom:8px">🏗️ <strong style="color:var(--text)">Built for:</strong> Shakthivel — Personal investment tracking</div>
+            <div style="margin-bottom:8px">🤖 <strong style="color:var(--text)">AI Engine:</strong> Claude Sonnet 4 (Anthropic)</div>
+            <div style="margin-bottom:8px">📲 <strong style="color:var(--text)">Alerts:</strong> CallMeBot WhatsApp API (Free)</div>
+            <div style="margin-bottom:8px">📈 <strong style="color:var(--text)">Market Data:</strong> Yahoo Finance (via proxy)</div>
+            <div style="margin-bottom:8px">💾 <strong style="color:var(--text)">Storage:</strong> Browser localStorage (100% private)</div>
+            <div style="margin-bottom:8px">🔒 <strong style="color:var(--text)">Privacy:</strong> No data sent to any server (except market APIs)</div>
+          </div>
+          <div class="divider"></div>
+          <div style="font-size:12px;color:var(--text3);text-align:center">ShakthiVest v1.0 · Made with ❤️ for your financial future</div>
+        </div>
+
+        <!-- QUICK STATS -->
+        <div class="card">
+          <div class="section-title" style="margin-bottom:12px">⚡ Quick Stats</div>
+          <div id="quick-stats" style="font-size:13px;line-height:2.2;color:var(--text2)">Loading…</div>
+        </div>
+
+      </div>
+    </div>
+  </main>
+</div>
+
+<script src="js/auth.js"></script>
+<script src="js/toast.js"></script>
+<script src="js/market.js"></script>
+<script src="js/portfolio.js"></script>
+<script src="js/alerts.js"></script>
+<script src="js/ai-suggest.js"></script>
+<script>
+Auth.checkAuth();
+
+window.addEventListener('DOMContentLoaded', () => {
+  loadAll();
+  updateStorageInfo();
+  updateQuickStats();
+});
+
+function loadAll() {
+  // API key
+  const key = AISuggest.getApiKey();
+  if (key) document.getElementById('anthropic-key').value = key;
+
+  // Profile
+  const prof = JSON.parse(localStorage.getItem('sv_profile') || '{}');
+  if (prof.name)   document.getElementById('prof-name').value   = prof.name;
+  if (prof.age)    document.getElementById('prof-age').value    = prof.age;
+  if (prof.income) document.getElementById('prof-income').value = prof.income;
+  if (prof.sip)    document.getElementById('prof-sip').value    = prof.sip;
+  if (prof.risk)   document.getElementById('prof-risk').value   = prof.risk;
+  if (prof.goal)   document.getElementById('prof-goal').value   = prof.goal;
+}
+
+function saveApiKey() {
+  const key = document.getElementById('anthropic-key').value.trim();
+  if (!key.startsWith('sk-ant-')) { Toast.show('Invalid key format. Should start with sk-ant-', 'error'); return; }
+  AISuggest.setApiKey(key);
+  Toast.show('✅ Anthropic API key saved!', 'success');
+  const st = document.getElementById('api-key-status');
+  st.style.display = 'block'; st.style.color = 'var(--teal)'; st.textContent = '✓ Key saved securely in your browser.';
+}
+
+async function testApiKey() {
+  const key = document.getElementById('anthropic-key').value.trim();
+  if (!key) { Toast.show('Enter an API key first', 'error'); return; }
+  AISuggest.setApiKey(key);
+  const btn = document.getElementById('test-api-btn');
+  btn.textContent = '⏳ Testing…'; btn.disabled = true;
+  const result = await AISuggest.getSuggestion({ amount: 1000, risk: 'medium', horizon: 'medium (1–5 years)' });
+  const st = document.getElementById('api-key-status');
+  st.style.display = 'block';
+  if (result.ok) {
+    Toast.show('✅ API key works!', 'success');
+    st.style.color = 'var(--teal)'; st.textContent = '✓ API key is valid and working!';
+  } else {
+    Toast.show('❌ API key failed: ' + result.error, 'error');
+    st.style.color = 'var(--red)'; st.textContent = '✗ ' + result.error;
+  }
+  btn.textContent = '🔍 Test Key'; btn.disabled = false;
+}
+
+function saveProfile() {
+  const prof = {
+    name:   document.getElementById('prof-name').value.trim(),
+    age:    document.getElementById('prof-age').value,
+    income: document.getElementById('prof-income').value,
+    sip:    document.getElementById('prof-sip').value,
+    risk:   document.getElementById('prof-risk').value,
+    goal:   document.getElementById('prof-goal').value,
+  };
+  localStorage.setItem('sv_profile', JSON.stringify(prof));
+  Toast.show('✅ Profile saved!', 'success');
+}
+
+function exportData() {
+  const data = {
+    portfolio:   JSON.parse(localStorage.getItem('sv_portfolio') || '[]'),
+    alertSettings: JSON.parse(localStorage.getItem('sv_alert_settings') || '{}'),
+    profile:     JSON.parse(localStorage.getItem('sv_profile') || '{}'),
+    exported:    new Date().toISOString(),
+  };
+  const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
+  const url  = URL.createObjectURL(blob);
+  const a    = document.createElement('a');
+  a.href = url; a.download = `ShakthiVest_Backup_${new Date().toISOString().split('T')[0]}.json`;
+  a.click(); URL.revokeObjectURL(url);
+  Toast.show('✅ Portfolio exported!', 'success');
+}
+
+function importData(e) {
+  const file = e.target.files[0];
+  if (!file) return;
+  const reader = new FileReader();
+  reader.onload = (ev) => {
+    try {
+      const data = JSON.parse(ev.target.result);
+      if (data.portfolio) localStorage.setItem('sv_portfolio', JSON.stringify(data.portfolio));
+      if (data.alertSettings) localStorage.setItem('sv_alert_settings', JSON.stringify(data.alertSettings));
+      if (data.profile) localStorage.setItem('sv_profile', JSON.stringify(data.profile));
+      Toast.show(`✅ Imported ${data.portfolio?.length || 0} investments!`, 'success');
+      updateStorageInfo(); updateQuickStats();
+    } catch {
+      Toast.show('❌ Invalid file format', 'error');
+    }
+  };
+  reader.readAsText(file);
+}
+
+function clearAllData() {
+  if (!confirm('⚠️ This will delete ALL your portfolio data, settings and alerts. Are you sure?')) return;
+  if (!confirm('Last chance — are you absolutely sure? This CANNOT be undone!')) return;
+  ['sv_portfolio','sv_alert_settings','sv_alert_log','sv_alert_sent','sv_profile','sv_anthropic_key'].forEach(k => localStorage.removeItem(k));
+  Toast.show('All data cleared.', 'info');
+  setTimeout(() => window.location.href = 'index.html', 1500);
+}
+
+function updateStorageInfo() {
+  const keys = ['sv_portfolio','sv_alert_settings','sv_alert_log','sv_profile'];
+  let totalChars = 0;
+  const info = document.getElementById('storage-info');
+  const lines = keys.map(k => {
+    const val = localStorage.getItem(k) || '';
+    totalChars += val.length;
+    const kb = (val.length / 1024).toFixed(1);
+    const labels = { sv_portfolio: '📊 Portfolio', sv_alert_settings: '🔔 Alert Settings', sv_alert_log: '📋 Alert Log', sv_profile: '👤 Profile' };
+    return `<div style="display:flex;justify-content:space-between"><span>${labels[k] || k}</span><span class="mono" style="color:var(--text3)">${kb} KB</span></div>`;
+  });
+  lines.push(`<div class="divider"></div><div style="display:flex;justify-content:space-between"><strong style="color:var(--text)">Total Used</strong><strong class="mono" style="color:var(--gold)">${(totalChars/1024).toFixed(1)} KB</strong></div>`);
+  info.innerHTML = lines.join('');
+}
+
+function updateQuickStats() {
+  const portfolio = Portfolio.getAll();
+  const summary   = Portfolio.getSummary();
+  const alertSent = JSON.parse(localStorage.getItem('sv_alert_log') || '[]').length;
+  const apiKey    = AISuggest.getApiKey();
+  const alertCfg  = Alerts.isConfigured();
+
+  document.getElementById('quick-stats').innerHTML = `
+    <div style="display:flex;justify-content:space-between"><span>📊 Portfolio positions</span><span class="mono" style="color:var(--text)">${portfolio.length}</span></div>
+    <div style="display:flex;justify-content:space-between"><span>💰 Total invested</span><span class="mono" style="color:var(--text)">${Market.fmtINR(summary.totalCost)}</span></div>
+    <div style="display:flex;justify-content:space-between"><span>📋 Alerts sent</span><span class="mono" style="color:var(--text)">${alertSent}</span></div>
+    <div style="display:flex;justify-content:space-between"><span>🤖 AI enabled</span><span class="mono" style="color:${apiKey?'var(--teal)':'var(--red)'}">${apiKey ? 'Yes ✓' : 'No — add key'}</span></div>
+    <div style="display:flex;justify-content:space-between"><span>📲 WhatsApp alerts</span><span class="mono" style="color:${alertCfg?'var(--teal)':'var(--red)'}">${alertCfg ? 'Configured ✓' : 'Not set up'}</span></div>
+  `;
+}
+
+function toggleKeyVisibility(inputId, btnId) {
+  const inp = document.getElementById(inputId);
+  const btn = document.getElementById(btnId);
+  if (inp.type === 'password') { inp.type = 'text'; btn.textContent = '🙈'; }
+  else { inp.type = 'password'; btn.textContent = '👁️'; }
+}
+</script>
+</body>
+</html>

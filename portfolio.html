@@ -1,0 +1,318 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>ShakthiVest — Portfolio</title>
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+<div class="app-layout">
+  <nav class="sidebar">
+    <div class="sidebar-logo">
+      <div class="logo-icon">💰</div>
+      <div><div class="logo-text">ShakthiVest</div><div class="logo-sub">INVEST SMART</div></div>
+    </div>
+    <div class="nav-section">
+      <div class="nav-label">Main</div>
+      <a href="dashboard.html" class="nav-item"><span class="nav-icon">🏠</span> Dashboard</a>
+      <a href="portfolio.html" class="nav-item active"><span class="nav-icon">📊</span> Portfolio</a>
+      <a href="alerts.html"   class="nav-item"><span class="nav-icon">🔔</span> Alerts</a>
+      <a href="settings.html" class="nav-item"><span class="nav-icon">⚙️</span> Settings</a>
+      <div class="nav-label">Quick Actions</div>
+      <div class="nav-item" onclick="openAddModal()"><span class="nav-icon">➕</span> Add Investment</div>
+      <div class="nav-item" onclick="analyzePortfolio()"><span class="nav-icon">🤖</span> AI Analyse</div>
+    </div>
+    <div class="sidebar-bottom">
+      <div class="user-pill">
+        <div class="user-avatar">S</div>
+        <div><div class="user-name">Shakthivel</div><div class="user-role">Investor · Age 21</div></div>
+      </div>
+      <div style="margin-top:8px"><div class="nav-item" onclick="Auth.logout()" style="color:var(--red)"><span class="nav-icon">🚪</span> Logout</div></div>
+    </div>
+  </nav>
+
+  <main class="main-content">
+    <div class="top-bar">
+      <div class="ticker-strip" id="ticker-strip">
+        <span style="color:var(--text3);font-size:12px">Loading market…</span>
+      </div>
+      <div class="top-right">
+        <button class="btn btn-primary btn-sm" onclick="openAddModal()">➕ Add Investment</button>
+        <div class="icon-btn" onclick="refreshPrices()" title="Refresh Prices">🔄</div>
+      </div>
+    </div>
+
+    <div class="page-header">
+      <div class="page-title">📊 My Portfolio</div>
+      <div class="page-sub">Track all your investments in one place</div>
+    </div>
+
+    <!-- STATS -->
+    <div class="stats-grid" style="margin-bottom:20px">
+      <div class="stat-card gold">
+        <div class="stat-label">Portfolio Value</div>
+        <div class="stat-value mono" id="s-total">₹0</div>
+        <div class="stat-icon">💰</div>
+      </div>
+      <div class="stat-card teal">
+        <div class="stat-label">Total Gain / Loss</div>
+        <div class="stat-value mono" id="s-pnl">₹0</div>
+        <div class="stat-change" id="s-pnl-pct"></div>
+        <div class="stat-icon">📈</div>
+      </div>
+      <div class="stat-card blue">
+        <div class="stat-label">Amount Invested</div>
+        <div class="stat-value mono" id="s-cost">₹0</div>
+        <div class="stat-icon">💼</div>
+      </div>
+      <div class="stat-card red">
+        <div class="stat-label">Positions</div>
+        <div class="stat-value mono" id="s-count">0</div>
+        <div class="stat-icon">🗂️</div>
+      </div>
+    </div>
+
+    <div class="grid-3-1" style="align-items:start;gap:18px;margin-bottom:18px">
+      <!-- ALLOCATION -->
+      <div class="card">
+        <div class="section-title" style="margin-bottom:14px">🥧 Portfolio Allocation</div>
+        <div id="p-allocation"></div>
+      </div>
+      <!-- AI ANALYSIS -->
+      <div class="card">
+        <div class="section-title" style="margin-bottom:10px">🤖 AI Portfolio Review</div>
+        <p style="font-size:12px;color:var(--text3);margin-bottom:12px">Get Claude's analysis of your current holdings.</p>
+        <button class="btn btn-primary btn-sm" onclick="analyzePortfolio()" id="analyse-btn" style="width:100%;justify-content:center">🔍 Analyse My Portfolio</button>
+        <div id="ai-analysis" style="display:none;margin-top:12px">
+          <div id="ai-analysis-result" class="ai-response loading">
+            <span class="typing-dot"></span><span class="typing-dot"></span><span class="typing-dot"></span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- FILTER + TABLE -->
+    <div class="card">
+      <div class="section-row">
+        <div class="section-title">All Investments</div>
+        <div style="display:flex;gap:8px;align-items:center">
+          <input id="search-inv" class="form-input" placeholder="🔍 Search…" style="width:180px;padding:7px 12px;font-size:12px" oninput="filterTable()" />
+          <button class="btn btn-primary btn-sm" onclick="openAddModal()">➕ Add</button>
+        </div>
+      </div>
+
+      <div class="type-filter" id="type-filter">
+        <div class="type-pill active" onclick="setFilter('all',this)">All</div>
+        <div class="type-pill" onclick="setFilter('stock',this)">📈 Stocks</div>
+        <div class="type-pill" onclick="setFilter('mutualfund',this)">📊 Mutual Funds</div>
+        <div class="type-pill" onclick="setFilter('gold',this)">🥇 Gold</div>
+        <div class="type-pill" onclick="setFilter('fd',this)">🏦 FD</div>
+        <div class="type-pill" onclick="setFilter('ppf',this)">🏛️ PPF/NPS</div>
+        <div class="type-pill" onclick="setFilter('crypto',this)">₿ Crypto</div>
+      </div>
+
+      <div id="portfolio-table">
+        <div style="color:var(--text3);padding:20px;text-align:center">Loading…</div>
+      </div>
+    </div>
+
+  </main>
+</div>
+
+<!-- ADD MODAL -->
+<div class="modal-overlay" id="add-modal">
+  <div class="modal">
+    <div class="modal-header">
+      <div class="modal-title" id="modal-title">➕ Add Investment</div>
+      <button class="close-btn" onclick="closeAddModal()">✕</button>
+    </div>
+    <div class="form-grid">
+      <div class="form-group">
+        <label class="form-label">Name *</label>
+        <input id="inv-name" class="form-input" placeholder="e.g. Nifty BeES ETF" />
+      </div>
+      <div class="form-group">
+        <label class="form-label">Type *</label>
+        <select id="inv-type" class="form-select">
+          <option value="stock">Stock</option>
+          <option value="mutualfund">Mutual Fund</option>
+          <option value="gold">Gold</option>
+          <option value="fd">Fixed Deposit</option>
+          <option value="ppf">PPF / NPS</option>
+          <option value="crypto">Crypto</option>
+        </select>
+      </div>
+    </div>
+    <div class="form-group">
+      <label class="form-label">NSE Symbol (optional, for live price)</label>
+      <input id="inv-symbol" class="form-input" placeholder="RELIANCE.NS / GOLDBEES.NS / ^NSEI" />
+    </div>
+    <div class="form-grid">
+      <div class="form-group">
+        <label class="form-label">Units *</label>
+        <input id="inv-units" class="form-input" type="number" placeholder="10" step="any" />
+      </div>
+      <div class="form-group">
+        <label class="form-label">Buy Price (₹) *</label>
+        <div class="amount-input-wrap">
+          <span class="amount-prefix">₹</span>
+          <input id="inv-buyprice" class="form-input" type="number" placeholder="500" step="any" />
+        </div>
+      </div>
+    </div>
+    <div class="form-grid">
+      <div class="form-group">
+        <label class="form-label">Current Price (₹)</label>
+        <div class="amount-input-wrap">
+          <span class="amount-prefix">₹</span>
+          <input id="inv-curprice" class="form-input" type="number" placeholder="Auto-fetched if symbol given" step="any" />
+        </div>
+      </div>
+      <div class="form-group">
+        <label class="form-label">Buy Date</label>
+        <input id="inv-date" class="form-input" type="date" />
+      </div>
+    </div>
+    <div class="form-group">
+      <label class="form-label">Drop Alert Threshold (%) — WhatsApp if drops this much</label>
+      <input id="inv-alert" class="form-input" type="number" placeholder="e.g. 5 (alert when down 5%)" min="1" max="99" />
+    </div>
+    <input type="hidden" id="edit-id" value="" />
+    <div style="display:flex;gap:10px;margin-top:4px">
+      <button class="btn btn-secondary" onclick="closeAddModal()" style="flex:1;justify-content:center">Cancel</button>
+      <button class="btn btn-primary" onclick="saveInvestment()" style="flex:1;justify-content:center" id="save-btn">💾 Save</button>
+    </div>
+  </div>
+</div>
+
+<script src="js/auth.js"></script>
+<script src="js/toast.js"></script>
+<script src="js/market.js"></script>
+<script src="js/portfolio.js"></script>
+<script src="js/alerts.js"></script>
+<script src="js/ai-suggest.js"></script>
+<script>
+Auth.checkAuth();
+let currentFilter = 'all';
+let editingId = null;
+
+window.addEventListener('DOMContentLoaded', () => {
+  document.getElementById('inv-date').value = new Date().toISOString().split('T')[0];
+  refreshPortfolioPage();
+  Market.init();
+});
+
+window.refreshPortfolioPage = function() {
+  updateStats();
+  Portfolio.renderTable('portfolio-table', currentFilter);
+  Portfolio.renderAllocation('p-allocation');
+};
+
+function updateStats() {
+  const s = Portfolio.getSummary();
+  document.getElementById('s-total').textContent = Market.fmtINR(s.totalVal);
+  document.getElementById('s-cost').textContent  = Market.fmtINR(s.totalCost);
+  document.getElementById('s-count').textContent = s.count;
+  const pnlEl = document.getElementById('s-pnl');
+  pnlEl.textContent = (s.totalPnL >= 0 ? '+' : '') + Market.fmtINR(s.totalPnL);
+  pnlEl.className = 'stat-value mono ' + (s.totalPnL >= 0 ? 'gain' : 'loss');
+  document.getElementById('s-pnl-pct').innerHTML = `<span class="${s.totalPnL>=0?'up':'down'}">${s.totalPnL>=0?'+':''}${s.totalPct.toFixed(2)}%</span>`;
+}
+
+function setFilter(f, el) {
+  currentFilter = f;
+  document.querySelectorAll('.type-pill').forEach(p => p.classList.remove('active'));
+  el.classList.add('active');
+  Portfolio.renderTable('portfolio-table', f);
+}
+
+function filterTable() {
+  const q = document.getElementById('search-inv').value.toLowerCase();
+  const rows = document.querySelectorAll('#portfolio-table tbody tr');
+  rows.forEach(r => { r.style.display = r.textContent.toLowerCase().includes(q) ? '' : 'none'; });
+}
+
+async function refreshPrices() {
+  Toast.show('Fetching live prices…', 'info');
+  await Portfolio.refreshPrices();
+  refreshPortfolioPage();
+  Toast.show('Prices updated!', 'success');
+}
+
+// MODAL
+function openAddModal(id = null) {
+  editingId = id;
+  const modal = document.getElementById('add-modal');
+  const title = document.getElementById('modal-title');
+  const saveBtn = document.getElementById('save-btn');
+  if (id) {
+    const inv = Portfolio.getById(id);
+    if (!inv) return;
+    title.textContent = '✏️ Edit Investment';
+    saveBtn.textContent = '💾 Update';
+    document.getElementById('inv-name').value     = inv.name;
+    document.getElementById('inv-type').value     = inv.type;
+    document.getElementById('inv-symbol').value   = inv.symbol || '';
+    document.getElementById('inv-units').value    = inv.units;
+    document.getElementById('inv-buyprice').value = inv.buyPrice;
+    document.getElementById('inv-curprice').value = inv.currentPrice || inv.buyPrice;
+    document.getElementById('inv-date').value     = inv.buyDate || '';
+    document.getElementById('inv-alert').value    = inv.alertThreshold || '';
+    document.getElementById('edit-id').value      = id;
+  } else {
+    title.textContent = '➕ Add Investment';
+    saveBtn.textContent = '💾 Save';
+    ['inv-name','inv-symbol','inv-units','inv-buyprice','inv-curprice','inv-alert'].forEach(i => document.getElementById(i).value = '');
+    document.getElementById('inv-date').value = new Date().toISOString().split('T')[0];
+    document.getElementById('edit-id').value = '';
+  }
+  modal.classList.add('open');
+}
+
+window.openEditModal = openAddModal;
+
+function closeAddModal() { document.getElementById('add-modal').classList.remove('open'); }
+
+function saveInvestment() {
+  const name     = document.getElementById('inv-name').value.trim();
+  const type     = document.getElementById('inv-type').value;
+  const symbol   = document.getElementById('inv-symbol').value.trim();
+  const units    = parseFloat(document.getElementById('inv-units').value);
+  const buyPrice = parseFloat(document.getElementById('inv-buyprice').value);
+  const curPrice = parseFloat(document.getElementById('inv-curprice').value) || buyPrice;
+  const buyDate  = document.getElementById('inv-date').value;
+  const alertTh  = parseFloat(document.getElementById('inv-alert').value) || null;
+  const id       = document.getElementById('edit-id').value;
+
+  if (!name || !units || !buyPrice) { Toast.show('Fill in required fields!', 'error'); return; }
+
+  if (id) {
+    Portfolio.update(id, { name, type, symbol, units, buyPrice, currentPrice: curPrice, buyDate, alertThreshold: alertTh });
+    Toast.show(`✅ ${name} updated!`, 'success');
+  } else {
+    Portfolio.add({ name, type, symbol, units, buyPrice, currentPrice: curPrice, buyDate, alertThreshold: alertTh });
+    Toast.show(`✅ ${name} added!`, 'success');
+  }
+  closeAddModal();
+  refreshPortfolioPage();
+}
+
+async function analyzePortfolio() {
+  const btn = document.getElementById('analyse-btn');
+  const div = document.getElementById('ai-analysis');
+  const res = document.getElementById('ai-analysis-result');
+  btn.textContent = '⏳ Analysing…';
+  btn.disabled = true;
+  div.style.display = 'block';
+  res.className = 'ai-response loading';
+  res.innerHTML = '<span class="typing-dot"></span><span class="typing-dot"></span><span class="typing-dot"></span>';
+  const result = await AISuggest.analyzePortfolio();
+  if (result.ok) { res.className = 'ai-response'; AISuggest.renderText('ai-analysis-result', result.text); }
+  else { res.className = 'ai-response'; res.innerHTML = `<span style="color:var(--red)">❌ ${result.error}</span><br><a href="settings.html" style="color:var(--gold);font-size:12px">→ Add API key in Settings</a>`; }
+  btn.textContent = '🔍 Analyse My Portfolio'; btn.disabled = false;
+}
+
+document.getElementById('add-modal').addEventListener('click', e => { if (e.target === document.getElementById('add-modal')) closeAddModal(); });
+</script>
+</body>
+</html>

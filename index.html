@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>ShakthiVest — Login</title>
+  <link rel="stylesheet" href="css/style.css">
+  <style>
+    .shake { animation: shake 0.4s ease; }
+    @keyframes shake { 0%,100%{transform:translateX(0)} 25%{transform:translateX(-10px)} 75%{transform:translateX(10px)} }
+    .input-icon-wrap { position:relative; }
+    .input-icon { position:absolute; left:14px; top:50%; transform:translateY(-50%); font-size:16px; }
+    .input-icon-wrap .form-input { padding-left:40px; }
+    .toggle-pw { position:absolute; right:12px; top:50%; transform:translateY(-50%); cursor:pointer; font-size:14px; color:var(--text3); background:none; border:none; }
+  </style>
+</head>
+<body>
+<div class="login-page">
+  <div class="login-bg"></div>
+  <div class="login-grid-bg"></div>
+
+  <!-- Floating particles -->
+  <div style="position:absolute;inset:0;pointer-events:none">
+    <div style="position:absolute;width:200px;height:200px;border-radius:50%;border:1px solid rgba(245,197,24,0.06);top:20%;left:10%;animation:spin 20s linear infinite"></div>
+    <div style="position:absolute;width:300px;height:300px;border-radius:50%;border:1px solid rgba(77,139,255,0.05);bottom:15%;right:8%;animation:spin 30s linear infinite reverse"></div>
+  </div>
+
+  <div class="login-box fade-in">
+    <div class="login-logo">
+      <div class="login-logo-icon">💰</div>
+      <div class="login-title">ShakthiVest</div>
+      <div class="login-subtitle">Your personal investment command centre</div>
+    </div>
+
+    <div id="login-error" class="login-error">⚠️ Invalid username or password</div>
+
+    <div class="login-form">
+      <div class="form-group">
+        <label class="form-label">Username</label>
+        <div class="input-icon-wrap">
+          <span class="input-icon">👤</span>
+          <input id="username" class="form-input" type="text" placeholder="Enter username" autocomplete="username" />
+        </div>
+      </div>
+      <div class="form-group">
+        <label class="form-label">Password</label>
+        <div class="input-icon-wrap">
+          <span class="input-icon">🔑</span>
+          <input id="password" class="form-input" type="password" placeholder="Enter password" autocomplete="current-password" />
+          <button class="toggle-pw" type="button" onclick="togglePw()" id="pw-toggle">👁️</button>
+        </div>
+      </div>
+
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:20px;font-size:12px">
+        <label style="display:flex;align-items:center;gap:6px;color:var(--text3);cursor:pointer">
+          <input type="checkbox" id="remember" style="accent-color:var(--gold)"> Remember me
+        </label>
+        <span style="color:var(--text3)">Personal Dashboard</span>
+      </div>
+
+      <button class="btn btn-primary login-btn" onclick="doLogin()">
+        🚀 Login to ShakthiVest
+      </button>
+    </div>
+
+    <div class="login-footer">
+      🔒 Secured · Personal Use Only · Shakthivel &copy; 2025
+    </div>
+  </div>
+</div>
+
+<script src="js/auth.js"></script>
+<script>
+  // Auto-redirect if already logged in
+  if (Auth.getSession()) window.location.href = 'dashboard.html';
+
+  document.addEventListener('keydown', e => { if (e.key === 'Enter') doLogin(); });
+
+  function doLogin() {
+    const username = document.getElementById('username').value.trim();
+    const password = document.getElementById('password').value;
+    const btn = document.querySelector('.login-btn');
+
+    btn.textContent = '⏳ Logging in...';
+    btn.disabled = true;
+
+    setTimeout(() => {
+      const result = Auth.login(username, password);
+      if (result.ok) {
+        btn.textContent = '✅ Welcome back!';
+        btn.style.background = 'var(--teal)';
+        setTimeout(() => window.location.href = 'dashboard.html', 600);
+      } else {
+        document.getElementById('login-error').style.display = 'block';
+        document.querySelector('.login-box').classList.add('shake');
+        setTimeout(() => document.querySelector('.login-box').classList.remove('shake'), 500);
+        btn.textContent = '🚀 Login to ShakthiVest';
+        btn.disabled = false;
+      }
+    }, 400);
+  }
+
+  function togglePw() {
+    const pw = document.getElementById('password');
+    const btn = document.getElementById('pw-toggle');
+    if (pw.type === 'password') { pw.type = 'text'; btn.textContent = '🙈'; }
+    else { pw.type = 'password'; btn.textContent = '👁️'; }
+  }
+</script>
+<style>@keyframes spin { from{transform:rotate(0deg)} to{transform:rotate(360deg)} }</style>
+</body>
+</html>
